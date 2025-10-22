@@ -6,7 +6,7 @@ function EmployeeDashboard({ user, onLogout, isManagerView = false, hideHeader =
   const { cedula, name, vacations } = user;
   const [showForm, setShowForm] = useState(false);
 
-  //  Calcular totales de cada año
+  //  Calcular totales de vacaciones
   const calculateTotals = (periods) => {
     const totalDisfrutar = periods.reduce((acc, p) => acc + p.diasDisfrutar, 0);
     const totalRestantes = periods.reduce((acc, p) => acc + p.diasRestantes, 0);
@@ -14,7 +14,7 @@ function EmployeeDashboard({ user, onLogout, isManagerView = false, hideHeader =
     return { totalDisfrutar, totalDisfrutados, totalRestantes };
   };
 
-  //  Generar el PDF (solo si la solicitud es válida)
+  //  Generar el PDF con la solicitud
   const generarMemoPDF = (data) => {
     const doc = new jsPDF();
 
@@ -30,7 +30,7 @@ function EmployeeDashboard({ user, onLogout, isManagerView = false, hideHeader =
     doc.text(`Cédula: ${cedula}`, 20, 63);
     doc.text(`Fecha de solicitud: ${new Date().toLocaleDateString()}`, 20, 71);
 
-    // Datos de la solicitud
+    // Detalles de la solicitud
     doc.text("Detalles de la solicitud:", 20, 90);
     doc.text(`Fecha de inicio: ${data.inicio}`, 30, 100);
     doc.text(`Fecha de fin: ${data.fin}`, 30, 108);
@@ -41,27 +41,26 @@ function EmployeeDashboard({ user, onLogout, isManagerView = false, hideHeader =
     doc.text(`${name}`, 20, 148);
     doc.text(`Cédula: ${cedula}`, 20, 156);
 
-    // Pie de página
+    // Pie
     doc.setFontSize(10);
     doc.text("Este documento fue generado automáticamente.", 20, 275);
 
-    // Guardar PDF
+    // Guardar el PDF
     doc.save(`MEMO-VACACIONES-${cedula}-${Date.now()}.pdf`);
   };
 
-  // 🔹 Manejar envío del formulario
+  //  Manejar solicitud de vacaciones
   const handleRequestSubmit = (data) => {
-    // Tomar los días disponibles del primer periodo con días restantes
     const diasDisponibles = Object.values(vacations)
       .flat()
       .reduce((acc, p) => acc + p.diasRestantes, 0);
 
     if (data.dias > diasDisponibles) {
       alert(
-        `Error : estás solicitando ${data.dias} días, pero solo tienes ${diasDisponibles} disponibles.`
+        `Error ❌: estás solicitando ${data.dias} días, pero solo tienes ${diasDisponibles} disponibles.`
       );
       setShowForm(false);
-      return; //  Cancela la solicitud y no genera el PDF
+      return; // Cancela la solicitud
     }
 
     generarMemoPDF(data);
@@ -71,7 +70,7 @@ function EmployeeDashboard({ user, onLogout, isManagerView = false, hideHeader =
 
   return (
     <div className="dashboard">
-      {/* Mostrar encabezado solo si no está oculto */}
+      {/*  Encabezado (solo visible si no está oculto) */}
       {!hideHeader && (
         <header>
           <div>
@@ -99,8 +98,7 @@ function EmployeeDashboard({ user, onLogout, isManagerView = false, hideHeader =
                 <strong>Disfrutados:</strong> {totals.totalDisfrutados}
               </p>
               <p>
-                <strong>Pendientes por disfrutar:</strong>{" "}
-                {totals.totalRestantes}
+                <strong>Pendientes por disfrutar:</strong> {totals.totalRestantes}
               </p>
             </div>
 
@@ -134,8 +132,8 @@ function EmployeeDashboard({ user, onLogout, isManagerView = false, hideHeader =
         );
       })}
 
-      {/* Botón de solicitud solo si aplica */}
-      {!isManagerView && !hideHeader && !showForm && (
+      {/*  Mostrar botón también para el jefe en su vista personal */}
+      {!showForm && (
         <button onClick={() => setShowForm(true)} className="boton">
           Solicitar vacaciones
         </button>

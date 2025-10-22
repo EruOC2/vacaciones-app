@@ -12,7 +12,7 @@ function App() {
   const handleLogin = (cedula) => {
     const data = vacationsData[cedula];
     if (!data) {
-      alert("❌ Cédula no encontrada");
+      alert(" Cédula no encontrada");
       return;
     }
     setUser({ ...data, cedula });
