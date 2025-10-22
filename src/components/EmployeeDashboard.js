@@ -57,7 +57,7 @@ function EmployeeDashboard({ user, onLogout, isManagerView = false, hideHeader =
 
     if (data.dias > diasDisponibles) {
       alert(
-        `Error ❌: estás solicitando ${data.dias} días, pero solo tienes ${diasDisponibles} disponibles.`
+        `Error : estás solicitando ${data.dias} días, pero solo tienes ${diasDisponibles} disponibles.`
       );
       setShowForm(false);
       return; // Cancela la solicitud
@@ -132,8 +132,8 @@ function EmployeeDashboard({ user, onLogout, isManagerView = false, hideHeader =
         );
       })}
 
-      {/*  Mostrar botón también para el jefe en su vista personal */}
-      {!showForm && (
+      {/* Mostrar botón solo cuando el usuario ve sus propias vacaciones */}
+      {!showForm && !isManagerView && (
         <button onClick={() => setShowForm(true)} className="boton">
           Solicitar vacaciones
         </button>
